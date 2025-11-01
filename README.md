@@ -21,8 +21,6 @@ It is widely used in network security, cloud data protection, and secure communi
 
 💻 Simple and clean user interface (CLI or GUI)
 
-🧰 Built using Python / C++ / Java (choose your language)
-
 ⚙️ How It Works
 
 User Input: Enter text or upload a file to encrypt.
@@ -39,14 +37,6 @@ SubBytes → ShiftRows → MixColumns → AddRoundKey (Encryption)
 
 Inverse operations (for Decryption)
 
-🧠 Algorithm Used: AES (Rijndael)
-
-AES works on substitution–permutation network structure and uses:
-
-1.S-Box for byte substitution
-2.ShiftRows for transposition
-3.MixColumns for diffusion
-4.AddRoundKey for XOR with round key
 
 Depending on key length:
 1.AES-128 → 10 Rounds
