@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AES with Login</title>
+<style>
+body, html { margin:0; padding:0; width:100%; height:100%; font-family:'Arial', sans-serif; overflow-x:hidden; color:white; }
+
+/* Login Page */
+#loginPage {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: url('https://static.vecteezy.com/system/resources/thumbnails/040/312/419/small_2x/ai-generated-digital-hand-presenting-cybersecurity-shield-free-photo.jpeg') center/cover no-repeat;
+    display:flex; justify-content:center; align-items:center;
+}
+#loginForm {
+    background: rgba(0,0,0,0.7); padding:40px; border-radius:15px; text-align:center;
+}
+#loginForm input { padding:12px 20px; border-radius:10px; border:none; margin:10px; width:200px; font-size:16px; }
+#loginForm button { padding:12px 20px; border-radius:10px; border:none; background:#ffcc00; color:black; font-size:16px; cursor:pointer; transition:0.3s; }
+#loginForm button:hover { background:#e6b800; }
+
+/* AES Page hidden initially */
+#aesPage { display:none; position:relative; }
+
+/* Background Image for AES */
+#aesBg {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: url('https://www.cobham.com/wp-content/uploads/shutterstock_281517014.webp') center/cover no-repeat;
+    z-index:-2;
+}
+
+/* Star Canvas overlay */
+#starCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
+
+/* Navbar */
+.navbar { position:fixed; top:20px; left:20px; display:flex; gap:25px; z-index:10; }
+.navbar a { color:white; text-decoration:none; font-weight:bold; font-size:18px; padding:8px 15px; border-radius:5px; background:rgba(0,0,0,0.5); transition:0.3s; }
+.navbar a:hover { background:#ffcc00; color:#000; }
+
+/* Header */
+.header { width:100%; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+.header h1 { font-size:80px; text-shadow:2px 2px 15px rgba(0,0,0,0.8); }
+.header p { font-size:26px; margin-top:10px; text-shadow:1px 1px 10px rgba(0,0,0,0.7); }
+
+/* Container & Boxes */
+.container { display:flex; flex-wrap:wrap; justify-content:center; padding:40px 20px; gap:30px; max-width:1200px; margin:auto; }
+.box, .definition, .key-features, .how-aes, #tryit { background:rgba(0,0,0,0.6); border-radius:15px; padding:25px; box-shadow:0 8px 20px rgba(0,0,0,0.5); transition:0.3s; }
+.box:hover, .definition:hover, .key-features:hover, .how-aes:hover, #tryit:hover { transform:translateY(-5px); box-shadow:0 12px 25px rgba(0,0,0,0.7); }
+.box { min-width:220px; text-align:center; font-weight:bold; font-size:18px; }
+
+/* Text sections */
+.definition h2, .key-features h3, .how-aes h3 { color:#ffcc00; margin-bottom:15px; border-bottom:2px solid #ffcc00; display:inline-block; padding-bottom:5px; }
+.definition p, .how-aes p, .key-features ul { font-size:16px; line-height:1.8; }
+.key-features ul { list-style-type:square; padding-left:20px; }
+
+/* Tryit section */
+#tryit { text-align:center; max-width:600px; margin:auto; }
+#tryit input, #tryit select, #tryit button { padding:12px 20px; border-radius:10px; border:none; margin:10px; font-size:16px; }
+#tryit input { width:220px; }
+#tryit select { width:150px; }
+#tryit button { background:#ffcc00; color:black; cursor:pointer; transition:0.3s; }
+#tryit button:hover { background:#e6b800; }
+#outputText { margin-top:20px; font-weight:bold; color:#ffcc00; word-break:break-word; }
+#history { margin-top:20px; max-height:200px; overflow-y:auto; background:rgba(0,0,0,0.5); padding:15px; border-radius:10px; text-align:left; }
+
+/* Responsive */
+@media screen and (max-width:900px) { .container { flex-direction:column; align-items:center; } #tryit input, #tryit select { width:80%; } }
+
+</style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div id="loginPage">
+    <form id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username"><br>
+        <input type="password" id="password" placeholder="Password"><br>
+        <button type="button" onclick="login()">Login</button>
+    </form>
+</div>
+
+<!-- AES Page -->
+<div id="aesPage">
+    <!-- AES Background Image -->
+    <div id="aesBg"></div>
+
+    <!-- Star Canvas -->
+    <canvas id="starCanvas"></canvas>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#tryit">Tryit</a>
+    </nav>
+
+    <!-- Header -->
+    <section class="header" id="home">
+        <h1>AES</h1>
+        <p>Advanced Encryption Standard</p>
+    </section>
+
+    <!-- About Section -->
+    <div class="container" id="about">
+        <div class="box">Block Size: 128 bits</div>
+        <div class="box">Key Size: 128/192/256 bits</div>
+        <div class="box">Rounds: 10/12/14</div>
+
+        <div class="definition">
+            <h2>What is AES?</h2>
+            <p>AES is a symmetric-key block cipher used worldwide. Supports 128/192/256-bit keys and replaced DES for higher security.</p>
+        </div>
+
+        <div class="key-features">
+            <h3>Key Features</h3>
+            <ul>
+                <li>Symmetric-key encryption</li>
+                <li>Block size 128 bits</li>
+                <li>Key size 128/192/256 bits</li>
+                <li>Rounds: 10/12/14 depending on key</li>
+                <li>Substitution-Permutation network</li>
+            </ul>
+        </div>
+
+        <div class="how-aes">
+            <h3>How AES Works</h3>
+            <p>AES operates on 128-bit blocks with variable key sizes. It performs rounds of substitution, permutation, mixing, and key addition.</p>
+        </div>
+    </div>
+
+    <!-- Tryit Section -->
+    <div id="tryit">
+        <h2>Try AES</h2>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
+            <input type="text" id="inputText" placeholder="Enter text here">
+            <input type="text" id="keyInput" placeholder="Enter key (min length)">
+            <select id="keySizeSelect">
+                <option value="128">AES-128</option>
+                <option value="192">AES-192</option>
+                <option value="256">AES-256</option>
+            </select>
+            <button onclick="encryptAES()">Encrypt</button>
+            <button onclick="decryptAES()">Decrypt</button>
+            <button onclick="clearText()">Clear</button>
+            <button onclick="copyText()">Copy</button>
+            <button onclick="copyHistory()">Copy History</button>
+        </div>
+        <p id="outputText"></p>
+        <div id="history"><strong>History:</strong></div>
+    </div>
+</div>
+
+<script>
+// Simple login
+function login(){
+    const user=document.getElementById('username').value;
+    const pass=document.getElementById('password').value;
+    if(user && pass){
+        document.getElementById('loginPage').style.display='none';
+        document.getElementById('aesPage').style.display='block';
+    } else {
+        alert('Enter username and password!');
+    }
+}
+
+// Star animation
+const starCanvas = document.getElementById('starCanvas');
+const sctx = starCanvas.getContext('2d');
+let sw = starCanvas.width = window.innerWidth;
+let sh = starCanvas.height = window.innerHeight;
+
+const stars = [];
+for(let i=0;i<150;i++){
+    stars.push({
+        x: Math.random()*sw,
+        y: Math.random()*sh,
+        r: Math.random()*2 + 1,
+        d: Math.random()*0.5 + 0.1,
+        twinkle: Math.random()*2*Math.PI
+    });
+}
+
+function drawStars(){
+    sctx.clearRect(0,0,sw,sh);
+    stars.forEach(star=>{
+        star.twinkle += 0.05;
+        const alpha = 0.5 + 0.5*Math.sin(star.twinkle);
+        sctx.beginPath();
+        sctx.arc(star.x, star.y, star.r, 0, Math.PI*2);
+        sctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        sctx.fill();
+        star.y -= star.d;
+        if(star.y < -5){ star.y = sh + 5; star.x = Math.random()*sw; }
+    });
+    requestAnimationFrame(drawStars);
+}
+drawStars();
+window.addEventListener('resize',()=>{ sw=starCanvas.width=window.innerWidth; sh=starCanvas.height=window.innerHeight; });
+
+// AES functionality
+let historyArr=[];
+async function getAESKey(keyStr,keySize){
+    const enc = new TextEncoder();
+    let sizeBytes = keySize/8;
+    let keyBytes = enc.encode(keyStr.padEnd(sizeBytes,'0').slice(0,sizeBytes));
+    return crypto.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['encrypt','decrypt']);
+}
+async function encryptAES(){
+    const text=document.getElementById('inputText').value;
+    const keyStr=document.getElementById('keyInput').value;
+    const keySize=parseInt(document.getElementById('keySizeSelect').value);
+    if(!text || !keyStr){ alert('Enter text and key!'); return; }
+    const key=await getAESKey(keyStr,keySize);
+    const iv=crypto.getRandomValues(new Uint8Array(16));
+    const enc=new TextEncoder();
+    const encrypted=await crypto.subtle.encrypt({name:'AES-CBC', iv}, key, enc.encode(text));
+    const buffer=new Uint8Array(encrypted);
+    const cipherText=btoa(String.fromCharCode(...iv)+String.fromCharCode(...buffer));
+    document.getElementById('outputText').innerText="Ciphertext: "+cipherText;
+    document.getElementById('inputText').value=cipherText;
+    addHistory(`Encrypted: ${cipherText}`);
+}
+async function decryptAES(){
+    const cipher=document.getElementById('inputText').value;
+    const keyStr=document.getElementById('keyInput').value;
+    const keySize=parseInt(document.getElementById('keySizeSelect').value);
+    if(!cipher || !keyStr){ alert('Enter ciphertext and key!'); return; }
+    try{
+        const combined=atob(cipher);
+        const iv=new Uint8Array([...combined.slice(0,16)].map(c=>c.charCodeAt(0)));
+        const data=new Uint8Array([...combined.slice(16)].map(c=>c.charCodeAt(0)));
+        const key=await getAESKey(keyStr,keySize);
+        const decrypted=await crypto.subtle.decrypt({name:'AES-CBC', iv}, key, data);
+        const decStr=new TextDecoder().decode(decrypted);
+        document.getElementById('outputText').innerText="Decrypted: "+decStr;
+        document.getElementById('inputText').value=decStr;
+        addHistory(`Decrypted: ${decStr}`);
+    } catch(e){ alert('Decryption failed!'); }
+}
+function clearText(){ document.getElementById('inputText').value=""; document.getElementById('outputText').innerText=""; }
+function copyText(){ navigator.clipboard.writeText(document.getElementById('outputText').innerText.replace(/^Ciphertext: |^Decrypted: /,'')); alert("Copied!"); }
+function addHistory(text){ historyArr.unshift(text); if(historyArr.length>5) historyArr.pop(); document.getElementById('history').innerHTML="<strong>History:</strong><br>"+historyArr.join('<br>'); }
+function copyHistory(){ navigator.clipboard.writeText(historyArr.join('\n')); alert("History copied!"); }
+
+</script>
+</body>
+</html>
